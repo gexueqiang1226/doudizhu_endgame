@@ -8,153 +8,154 @@
 #include <vector>
 #include <bitset>
 
-namespace doudizhu_endgame {
+namespace doudizhu_endgame
+{
 
-class CardSet {
-public:
-    CardSet() = default;
-
-    ~CardSet() = default;
-
-    bool operator==(const CardSet &other)
+    class CardSet
     {
-        return this->card_mask_ == other.card_mask_;
-    }
+    public:
+        CardSet() = default;
 
-    //
-    size_t size() const
-    {
-        return card_mask_.count();
-    }
+        ~CardSet() = default;
 
-    bool empty() const
-    {
-        return card_mask_.none();
-    }
+        bool operator==(const CardSet &other)
+        {
+            return this->card_mask_ == other.card_mask_;
+        }
 
-    void clear()
-    {
-        card_mask_.reset();
-    }
+        //
+        size_t size() const
+        {
+            return card_mask_.count();
+        }
 
-    bool test(size_t pos) const
-    {
-        return card_mask_[pos];
-    }
+        bool empty() const
+        {
+            return card_mask_.none();
+        }
 
-    uint64_t to_ullong() const
-    {
-        return card_mask_.to_ullong();
-    }
+        void clear()
+        {
+            card_mask_.reset();
+        }
 
-    size_t find_first() const
-    {
-        return card_mask_._Find_first();
-    }
+        bool test(size_t pos) const
+        {
+            return card_mask_[pos];
+        }
 
-    size_t find_next(size_t prev) const
-    {
-        return card_mask_._Find_next(prev);
-    }
+        uint64_t to_ullong() const
+        {
+            return card_mask_.to_ullong();
+        }
 
-    bool is_single(int8_t card) const
-    {
-        return card_mask_[card << 2];
-    }
+        size_t find_first() const
+        {
+            return card_mask_._Find_first();
+        }
 
-    bool is_pair(int8_t card) const
-    {
-        return card_mask_[(card << 2) + 1];
-    }
+        size_t find_next(size_t prev) const
+        {
+            return card_mask_._Find_next(prev);
+        }
 
-    bool is_trio(int8_t card) const
-    {
-        return card_mask_[(card << 2) + 2];
-    }
+        bool is_single(int8_t card) const
+        {
+            return card_mask_[card << 2];
+        }
 
-    bool is_bomb(int8_t card) const
-    {
-        return card_mask_[(card << 2) + 3];
-    }
+        bool is_pair(int8_t card) const
+        {
+            return card_mask_[(card << 2) + 1];
+        }
 
-    void set(size_t pos)
-    {
-        card_mask_.set(pos);
-    }
+        bool is_trio(int8_t card) const
+        {
+            return card_mask_[(card << 2) + 2];
+        }
 
-    void set(size_t pos, bool val)
-    {
-        card_mask_.set(pos, val);
-    }
+        bool is_bomb(int8_t card) const
+        {
+            return card_mask_[(card << 2) + 3];
+        }
 
-    //全部移除些张牌, 要移除的牌全部部置为1,比如移除‘3’,‘5’（index为0, 2）：
-    //before：0011 0010 0111
-    //taken： 1111 0000 1111
-    //after： 0000 0010 0000
+        void set(size_t pos)
+        {
+            card_mask_.set(pos);
+        }
 
-    void remove_taken(CardSet &taken)
-    {
-        taken.card_mask_.flip();
-        card_mask_ &= taken.card_mask_;
-    }
+        void set(size_t pos, bool val)
+        {
+            card_mask_.set(pos, val);
+        }
 
-    void set_single(int8_t card)
-    {
-        card_mask_.set((size_t) (card << 2));
-    }
+        // 全部移除些张牌, 要移除的牌全部部置为1,比如移除‘3’,‘5’（index为0, 2）：
+        // before：0011 0010 0111
+        // taken： 1111 0000 1111
+        // after： 0000 0010 0000
 
-    void set_pair(int8_t card)
-    {
-        card <<= 2;
-        card_mask_.set((size_t) card);
-        card_mask_.set((size_t) (card + 1));
-    }
+        void remove_taken(CardSet &taken)
+        {
+            taken.card_mask_.flip();
+            card_mask_ &= taken.card_mask_;
+        }
 
-    void set_rocket();
+        void set_single(int8_t card)
+        {
+            card_mask_.set((size_t)(card << 2));
+        }
 
-    void set_single(int8_t card, bool val);
+        void set_pair(int8_t card)
+        {
+            card <<= 2;
+            card_mask_.set((size_t)card);
+            card_mask_.set((size_t)(card + 1));
+        }
 
-    void set_pair(int8_t card, bool val);
+        void set_rocket();
 
-    void set_trio(int8_t card);
+        void set_single(int8_t card, bool val);
 
-    void set_trio_single(int8_t trio, int8_t single);
+        void set_pair(int8_t card, bool val);
 
-    void set_trio_pair(int8_t trio, int8_t pair);
+        void set_trio(int8_t card);
 
-    void set_bomb(int8_t bomb);
+        void set_trio_single(int8_t trio, int8_t single);
 
-    void set_straight_s(int8_t start, int8_t end);
+        void set_trio_pair(int8_t trio, int8_t pair);
 
-    void set_straight_p(int8_t start, int8_t end);
+        void set_bomb(int8_t bomb);
 
-    void set_plane(int8_t start, int8_t end);
+        void set_straight_s(int8_t start, int8_t end);
 
-    void set_plane_single(int8_t start, int8_t end, std::vector<int8_t> &comb);
+        void set_straight_p(int8_t start, int8_t end);
 
-    void set_plane_pair(int8_t start, int8_t end, std::vector<int8_t> &comb);
+        void set_plane(int8_t start, int8_t end);
 
-    //部分移除
-    //card_mask_: 0000 0111 1111
-    //hand:  0000 0001 0111
-    //after: 0000 0011 0001
-    void remove(const CardSet &hand);
+        void set_plane_single(int8_t start, int8_t end, std::vector<int8_t> &comb);
 
-    bool has_count(int8_t card, int8_t count) const;
+        void set_plane_pair(int8_t start, int8_t end, std::vector<int8_t> &comb);
 
-    std::string str();
+        // 部分移除
+        // card_mask_: 0000 0111 1111
+        // hand:  0000 0001 0111
+        // after: 0000 0011 0001
+        void remove(const CardSet &hand);
 
-    std::string bitset_str();
+        bool has_count(int8_t card, int8_t count) const;
 
-    void from_string(std::string string);
+        std::string str();
 
-    void from_c_string(char *string);
+        std::string bitset_str();
 
-private:
+        void from_string(std::string string);
 
-    std::bitset<64> card_mask_;
-};
+        void from_c_string(char *string);
 
-}   //namespace doudizhu_endgame
+    private:
+        std::bitset<64> card_mask_;
+    };
 
-#endif //DOUDIZHU_ENDGAME_CARDSET_H
+} // namespace doudizhu_endgame
+
+#endif // DOUDIZHU_ENDGAME_CARDSET_H

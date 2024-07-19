@@ -8,80 +8,79 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cardset.h"
+#include "CardSet.h"
 #include "ddz_hand.h"
 
-namespace doudizhu_endgame {
+namespace doudizhu_endgame
+{
 
 #define TRANSPOSITION_TABLE_INIT_SIZE 3000000
 
-struct TreeNode {
-    int8_t                   turn;       //0: lord 1:farmer
-    int8_t                   score;
-    CardSet                  lord;
-    CardSet                  farmer;
-    Pattern                 *last_move;
-    std::vector<TreeNode *>  child;
-};
-
-class TranspositionTable {
-public:
-
-    TranspositionTable()
+    struct TreeNode
     {
-        table_.reserve(TRANSPOSITION_TABLE_INIT_SIZE);
-    }
+        int8_t turn; // 0: lord 1:farmer
+        int8_t score;
+        CardSet lord;
+        CardSet farmer;
+        Pattern *last_move;
+        std::vector<TreeNode *> child;
+    };
 
-    ~TranspositionTable() = default;
-
-    size_t size();
-    void add(TreeNode *node);
-
-    //return score from table, if not in table return 0
-    int8_t get(TreeNode *node);
-
-private:
-
-    std::unordered_map<uint64_t, int8_t> table_;
-    uint64_t gen_key(TreeNode* node);
-};
-
-class Negamax {
-public:
-
-    Negamax();
-    ~Negamax();
-
-    TreeNode *search(const CardSet& lord, const CardSet& farmer);
-    //for research
-    TreeNode *search(const CardSet& lord, const CardSet& farmer, Pattern* last);
-
-    size_t nodes_searched()
+    class TranspositionTable
     {
-        return nodes_searched_;
-    }
+    public:
+        TranspositionTable()
+        {
+            table_.reserve(TRANSPOSITION_TABLE_INIT_SIZE);
+        }
 
-    double hash_hit_rate()
+        ~TranspositionTable() = default;
+
+        size_t size();
+        void add(TreeNode *node);
+
+        // return score from table, if not in table return 0
+        int8_t get(TreeNode *node);
+
+    private:
+        std::unordered_map<uint64_t, int8_t> table_;
+        uint64_t gen_key(TreeNode *node);
+    };
+
+    class Negamax
     {
-        return ((double)hash_hit_ / nodes_searched_) * 100;
-    }
+    public:
+        Negamax();
+        ~Negamax();
 
-private:
+        TreeNode *search(const CardSet &lord, const CardSet &farmer);
+        // for research
+        TreeNode *search(const CardSet &lord, const CardSet &farmer, Pattern *last);
 
-    TreeNode           *tree_;
-    TranspositionTable  table_;
-    DouDiZhuHand        doudizhu_;
+        size_t nodes_searched()
+        {
+            return nodes_searched_;
+        }
 
-    size_t nodes_searched_{};
-    size_t hash_hit_{};
+        double hash_hit_rate()
+        {
+            return ((double)hash_hit_ / nodes_searched_) * 100;
+        }
 
-    int8_t negamax(TreeNode *node);
-    void gen_nodes(TreeNode *node);
-    void pruning_tree(TreeNode* node);
-    void destroy_tree(TreeNode* node);
+    private:
+        TreeNode *tree_;
+        TranspositionTable table_;
+        DouDiZhuHand doudizhu_;
 
-};
+        size_t nodes_searched_{};
+        size_t hash_hit_{};
 
-} //namespace doudizhu_endgame
+        int8_t negamax(TreeNode *node);
+        void gen_nodes(TreeNode *node);
+        void pruning_tree(TreeNode *node);
+        void destroy_tree(TreeNode *node);
+    };
 
-#endif //DOUDIZHU_ENDGAME_NEGAMAX_H
+} // namespace doudizhu_endgame
+
+#endif // DOUDIZHU_ENDGAME_NEGAMAX_H
