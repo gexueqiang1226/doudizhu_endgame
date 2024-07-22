@@ -30,10 +30,16 @@ namespace doudizhu_endgame
         {'P', 15}};
 
     // val to string
-    static const std::string str_map[16]{"3 ", "4 ", "5 ", "6 ", "7 ",
-                                         "8 ", "9 ", "10 ", "J ", "Q ",
-                                         "K ", "A ", "2 ", "小王 ", "大王 ",
-                                         "Pass "};
+    static const std::string str_map_h[16]{"3 ", "4 ", "5 ", "6 ", "7 ",
+                                           "8 ", "9 ", "10 ", "J ", "Q ",
+                                           "K ", "A ", "2 ", "小王 ", "大王 ",
+                                           "Pass "};
+
+    // val to string
+    static const std::string str_map[16]{"3", "4", "5", "6", "7",
+                                         "8", "9", "0", "J", "Q",
+                                         "K", "A", "2", "Y", "Z",
+                                         "P"};
 
     void CardSet::set_rocket()
     {
@@ -189,6 +195,34 @@ namespace doudizhu_endgame
         if (string.length() == 0)
         {
             string += str_map[15];
+        }
+
+        string.pop_back();
+        return string;
+    }
+
+    std::string CardSet::str_h()
+    {
+        std::string string;
+        size_t pos = card_mask_._Find_first();
+        while (pos < 64)
+        {
+            size_t index = (pos >> 2);
+            if (index < 16)
+            {
+                // 牌面大在前
+                string.insert(0, str_map_h[index]);
+            }
+            else
+            {
+                // invalid card
+            }
+            pos = card_mask_._Find_next(pos);
+        }
+
+        if (string.length() == 0)
+        {
+            string += str_map_h[15];
         }
 
         string.pop_back();

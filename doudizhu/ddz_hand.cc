@@ -96,6 +96,23 @@ namespace doudizhu_endgame
         get_pass(hand, last, next_moves);
     }
 
+    Pattern *DouDiZhuHand::check_hand(const CardSet &hand)
+    {
+        std::vector<Pattern *> next_moves;
+        CardSet res;
+        this->next_hand(hand, this->pattern_pool_.get(-1, Pass, res), next_moves);
+        Pattern *ret;
+        for (Pattern *move : next_moves)
+        {
+            if (move->hand.size() == hand.size())
+            {
+                ret = move;
+                break;
+            }
+        }
+        return ret;
+    }
+
     void DouDiZhuHand::get_pass(const CardSet &hand, Pattern *last, std::vector<Pattern *> &next_moves)
     {
         if (last->type != Pass)

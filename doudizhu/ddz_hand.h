@@ -61,6 +61,8 @@ namespace doudizhu_endgame
         void play(const CardSet &hand, Pattern *toplay, CardSet &res);
 
         void next_hand(const CardSet &hand, Pattern *last, std::vector<Pattern *> &next_moves);
+        
+        Pattern* check_hand(const CardSet &hand);
 
     private:
         PatternPool pattern_pool_;

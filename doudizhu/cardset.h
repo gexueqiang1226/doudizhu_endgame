@@ -144,6 +144,7 @@ namespace doudizhu_endgame
 
         bool has_count(int8_t card, int8_t count) const;
 
+        std::string str_h();
         std::string str();
 
         std::string bitset_str();
