@@ -3,9 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ddz_hand.h"
-#include "cardset.h"
-#include "negamax.h"
+#include "ddzend_engine.h"
 
 int *get_integer_array(lua_State *L, int index, int *size)
 {
@@ -56,10 +54,15 @@ static int call(lua_State *L)
 {
     luaL_checktype(L, -1, LUA_TTABLE);
     const char *lord = get_string_value_by_name(L, -1, "lord");
-    const char *lord = get_string_value_by_name(L, -1, "farmer");
+    const char *farmer = get_string_value_by_name(L, -1, "farmer");
     const char *last = get_string_value_by_name(L, -1, "last");
-    // lua_pusturnhstring(L,public_buffer);
-    // lua_pushstring(L,"ok2");
+    int turn = get_integer_value_by_name(L, -1, "turn");
+    int states = get_integer_value_by_name(L, -1, "states");
+    printf("args lord: %s, farmer: %s, last: %s, turn: %d, states: %d", lord, farmer, last, turn, states);
+    printf("\n");
+    char *result = ddzend_search(lord, farmer, last, turn, states);
+    printf("result: %s", result);
+    lua_pushstring(L, result);
     return 1;
 }
 

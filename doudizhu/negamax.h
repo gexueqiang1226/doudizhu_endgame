@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "CardSet.h"
+#include "cardset.h"
 #include "ddz_hand.h"
 
 namespace doudizhu_endgame
