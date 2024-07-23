@@ -5,81 +5,47 @@
 extern "C"
 {
 #endif
-    char *ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states)
+    const char *ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states)
     {
 
-        if ((lord == nullptr || lord[0] != '\0') || (farmer == nullptr || farmer[0] != '\0'))
+        if ((lord == nullptr || lord[0] == '\0') || (farmer == nullptr || farmer[0] == '\0'))
         {
             return nullptr;
         }
         doudizhu_endgame::CardSet c1, c2;
         c1.from_c_string(const_cast<char *>(turn == 0 ? farmer : lord));
         c2.from_c_string(const_cast<char *>(turn == 0 ? lord : farmer));
-        doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
-        std::string ret;
+
+        std::string ret = "";
+        doudizhu_endgame::Pattern *last_hand = nullptr;
+        doudizhu_endgame::DouDiZhuHand hand;
+        doudizhu_endgame::CardSet ltcard;
         if (last != nullptr && last[0] != '\0')
         {
-            doudizhu_endgame::Pattern *last_hand = nullptr;
-            doudizhu_endgame::DouDiZhuHand hand;
-            doudizhu_endgame::CardSet ltcard;
             ltcard.from_c_string(const_cast<char *>(last));
             last_hand = hand.check_hand(ltcard);
+            printf("ddzend_search last %s, %d, %d \n", last_hand->hand.str().c_str(), last_hand->type, last_hand->power);
             if (!last_hand)
             {
                 // 给的上手牌不合法
                 return nullptr;
             }
-
-            doudizhu_endgame::TreeNode *root = engine->search(c1, c2, last_hand);
-
-            doudizhu_endgame::Pattern *last_move = nullptr;
-            for (auto child : root->child)
-            {
-                if (child->last_move->hand.bitset_str() == last_hand->hand.bitset_str())
-                {
-                    last_move = child->last_move;
-                    if (!child->child.empty())
-                    {
-                        ret = child->child[0]->last_move->hand.str();
-                    }
-                    break;
-                }
-            }
-
-            if (!root->lord.empty() && last_move != nullptr)
-            {
-                c2.remove(last_move->hand);
-                doudizhu_endgame::Pattern last_{last_move->power, last_move->type, last_move->hand};
-                delete engine;
-                engine = new doudizhu_endgame::Negamax();
-                doudizhu_endgame::TreeNode *re = engine->search(c1, c2, &last_);
-                if (!re->child.empty())
-                {
-                    ret = re->child[0]->last_move->hand.str();
-                }
-                else
-                {
-                    ret = "";
-                }
-            }
         }
-        else
+        doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
+        printf("c1 %s \n", c1.str_h().c_str());
+        printf("c2 %s \n", c2.str_h().c_str());
+        doudizhu_endgame::TreeNode *root = engine->search(c1, c2, last_hand);
+
+        printf("child len %d \n", root->child.size());
+        if (!root->child.empty())
         {
-            doudizhu_endgame::TreeNode *root = engine->search(c1, c2);
-            if (root->score == 1 && !root->child.empty())
-            {
-                ret = root->child[0]->last_move->hand.str();
-            }
-            else
-            {
-                ret = "";
-            }
+            printf("child %s \n", root->child[0]->last_move->hand.str().c_str());
+            ret = root->child[0]->last_move->hand.str();
         }
-        if (engine)
-        {
-            delete engine;
-        }
-        return const_cast<char *>(ret.data());
+
+        delete engine;
+
+        return ret.c_str();
     }
 
 #ifdef __cplusplus

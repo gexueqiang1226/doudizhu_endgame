@@ -94,6 +94,11 @@ namespace doudizhu_endgame
         get_plane_pair(hand, last, next_moves);
 
         get_pass(hand, last, next_moves);
+
+        for (Pattern *move : next_moves)
+        {
+            printf("next_hand move  %s \n", move->hand.str().c_str());
+        }
     }
 
     Pattern *DouDiZhuHand::check_hand(const CardSet &hand)
@@ -110,6 +115,7 @@ namespace doudizhu_endgame
                 break;
             }
         }
+        printf("check_hand last %s, %d, %d \n", ret->hand.str().c_str(), ret->type, ret->power);
         return ret;
     }
 
@@ -154,7 +160,6 @@ namespace doudizhu_endgame
             {
                 if (hand.is_pair(i) && i > last->power)
                 {
-
                     CardSet res;
                     res.set_pair(i);
                     Pattern *tmp = pattern_pool_.get(i, Pair, res);

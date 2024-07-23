@@ -53,10 +53,12 @@ namespace doudizhu_endgame
 
             for (Pattern *move : selections)
             {
+                printf("gen_nodes move %s \n", move->hand.str_h().c_str());
                 CardSet after_play;
                 doudizhu_.play(node->lord, move, after_play);
 
                 auto child = new TreeNode{1, 0, after_play, node->farmer, move};
+                printf("gen_nodes after_play %s \n", after_play.str_h().c_str());
                 if (after_play.empty())
                 {
                     child->score = -1;
@@ -85,7 +87,14 @@ namespace doudizhu_endgame
             return search;
         }
 
+        printf("negamax lord %d, %s \n", nodes_searched_, node->lord.str_h().c_str());
+        printf("negamax farmer %d, %s \n", nodes_searched_, node->farmer.str_h().c_str());
+        printf("negamax last_move %d, %s \n", nodes_searched_, node->last_move->hand.str_h().c_str());
+
         gen_nodes(node);
+
+        printf("negamax child %d \n", node->child.size());
+        
         int8_t score = -1;
         for (TreeNode *&child : node->child)
         {
@@ -106,7 +115,7 @@ namespace doudizhu_endgame
                 break; // 发生剪枝
             }
         }
-
+        printf("negamax score %d, %d \n", nodes_searched_, score);
         node->score = score;
         table_.add(node);
         pruning_tree(node);
@@ -128,9 +137,11 @@ namespace doudizhu_endgame
 
     TreeNode *Negamax::search(const CardSet &lord, const CardSet &farmer, Pattern *last)
     {
+        printf("search last %s, %d, %d \n", last->hand.str().c_str(), last->type, last->power);
         auto root = new TreeNode{0, 0, lord, farmer, last};
 
         negamax(root);
+        printf("search child %d \n", root->child.size());
         tree_ = root;
 
         return root;

@@ -196,8 +196,6 @@ namespace doudizhu_endgame
         {
             string += str_map[15];
         }
-
-        string.pop_back();
         return string;
     }
 

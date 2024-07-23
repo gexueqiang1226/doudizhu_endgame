@@ -50,7 +50,7 @@ const char *get_string_value_by_name(lua_State *L, int index, const char *name)
  * states int  一些规则(保留字段)
  * return string 要出的牌 空串表示无法赢
  */
-static int call(lua_State *L)
+static int lua_ddz_endgame_call(lua_State *L)
 {
     luaL_checktype(L, -1, LUA_TTABLE);
     const char *lord = get_string_value_by_name(L, -1, "lord");
@@ -58,16 +58,16 @@ static int call(lua_State *L)
     const char *last = get_string_value_by_name(L, -1, "last");
     int turn = get_integer_value_by_name(L, -1, "turn");
     int states = get_integer_value_by_name(L, -1, "states");
-    printf("args lord: %s, farmer: %s, last: %s, turn: %d, states: %d", lord, farmer, last, turn, states);
-    printf("\n");
-    char *result = ddzend_search(lord, farmer, last, turn, states);
-    printf("result: %s", result);
-    lua_pushstring(L, result);
+    printf("args lord: %s, farmer: %s, last: %s, turn: %d, states: %d \n", lord, farmer, last, turn, states);
+    const char *result = ddzend_search(lord, farmer, last, turn, states);
+    printf("result: %s \n", result);
+    const char* ret = lua_pushstring(L, result);
+    printf("result1 : %s \n", ret);
     return 1;
 }
 
 static const struct luaL_Reg reg[] = {
-    {"call", call},
+    {"call", lua_ddz_endgame_call},
     {NULL, NULL}};
 
 int luaopen_ddz_endgame(lua_State *L)
