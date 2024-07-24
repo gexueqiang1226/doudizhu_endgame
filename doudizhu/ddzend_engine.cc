@@ -24,7 +24,6 @@ extern "C"
         {
             ltcard.from_c_string(const_cast<char *>(last));
             last_hand = hand.check_hand(ltcard);
-            printf("ddzend_search last %s, %d, %d \n", last_hand->hand.str().c_str(), last_hand->type, last_hand->power);
             if (!last_hand)
             {
                 // 给的上手牌不合法
@@ -32,20 +31,23 @@ extern "C"
             }
         }
         doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
-        printf("c1 %s \n", c1.str_h().c_str());
-        printf("c2 %s \n", c2.str_h().c_str());
-        doudizhu_endgame::TreeNode *root = engine->search(c1, c2, last_hand);
-
-        printf("child len %d \n", root->child.size());
+        doudizhu_endgame::TreeNode *root = nullptr;
+        if (last_hand)
+        {
+            root = engine->search(c1, c2, last_hand);
+        }
+        else
+        {
+            root = engine->search(c1, c2);
+        }
         if (!root->child.empty())
         {
-            printf("child %s \n", root->child[0]->last_move->hand.str().c_str());
             ret = root->child[0]->last_move->hand.str();
         }
 
         delete engine;
 
-        return ret.c_str();
+        return ret.data();
     }
 
 #ifdef __cplusplus
