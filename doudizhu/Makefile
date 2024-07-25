@@ -1,9 +1,9 @@
 CC = gcc
 C++ = g++
 LINK = g++
- 
-CCFLAGS = -c -g -fPIC
-C++FLAGS = -c -g -fPIC
+
+CCFLAGS = -c -g -fPIC -O3 -Wall
+C++FLAGS = -c -g -fPIC -O3 -Wall -std=gnu++14
 
 #期望得到的执行文件或动态库.so
 TARGET=ddz_endgame.so
@@ -18,7 +18,7 @@ OBJFILE = $(CFILES:.c=.o) $(C++FILES:.cpp=.o)
 all:$(TARGET)
  
 $(TARGET): $(OBJFILE)
-	$(LINK) $^ -Wall -fPIC -shared -o $@
+	$(LINK) $^ -Wall -fPIC -O3 -shared -o $@
  
 %.o:%.c
 	$(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
