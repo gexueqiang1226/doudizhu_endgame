@@ -64,36 +64,111 @@ namespace doudizhu_endgame
         // 搜索的顺序对剪枝的发生影响很大,
         //  这里把 pass 作为最后考虑的选项
         next_moves.reserve(50);
+        if (last->type != Pass)
+        {
+            switch (last->type)
+            {
+            case Pair:
+            {
+                get_pair(hand, last, next_moves);
+                break;
+            }
+            case Single:
+            {
+                get_single(hand, last, next_moves);
+                break;
+            }
+            case Triple_single:
+            {
+                get_triple_single(hand, last, next_moves);
+                break;
+            }
+            case Triple_pair:
+            {
+                get_triple_pair(hand, last, next_moves);
+                break;
+            }
+            case Triple:
+            {
+                get_triple(hand, last, next_moves);
+                break;
+            }
+            case Straight_single:
+            {
+                get_straight_single(hand, last, next_moves);
+                break;
+            }
+            case Straight_pair:
+            {
+                get_straight_pair(hand, last, next_moves);
+                break;
+            }
+            case Bomb_single:
+            {
+                get_bomb_single(hand, last, next_moves);
+                break;
+            }
+            case Bomb_pair:
+            {
+                get_bomb_pair(hand, last, next_moves);
+                break;
+            }
+            case Plane:
+            {
+                get_plane(hand, last, next_moves);
+                break;
+            }
+            case Plane_single:
+            {
+                get_plane_single(hand, last, next_moves);
+                break;
+            }
+            case Plane_pair:
+            {
+                get_plane_pair(hand, last, next_moves);
+                break;
+            }
+            default:
+            }
+            get_rocket(hand, next_moves);
+            get_bomb(hand, last, next_moves);
+            get_pass(hand, last, next_moves);
+        }
+        else
+        {
+            get_rocket(hand, next_moves);
+            get_pair(hand, last, next_moves);
+            get_single(hand, last, next_moves);
 
-        get_rocket(hand, next_moves);
+            // check card '7' and '10'
+            if (hand.is_single(4) || hand.is_single(7))
+            {
+                get_straight_single(hand, last, next_moves);
+            }
+            get_straight_pair(hand, last, next_moves);
 
-        get_pair(hand, last, next_moves);
-
-        get_single(hand, last, next_moves);
-
-        get_triple_single(hand, last, next_moves);
-
-        get_triple_pair(hand, last, next_moves);
-
-        get_straight_single(hand, last, next_moves);
-
-        get_straight_pair(hand, last, next_moves);
-
-        get_triple(hand, last, next_moves);
-
-        get_bomb(hand, last, next_moves);
-
-        get_bomb_single(hand, last, next_moves);
-
-        get_bomb_pair(hand, last, next_moves);
-
-        get_plane(hand, last, next_moves);
-
-        get_plane_single(hand, last, next_moves);
-
-        get_plane_pair(hand, last, next_moves);
-
-        get_pass(hand, last, next_moves);
+            bool get_move_continue = false;
+            for (int8_t card = 0; card < 13; ++card)
+            {
+                if (hand.is_trio(card))
+                {
+                    get_move_continue = true;
+                    break;
+                }
+            }
+            if (get_move_continue)
+            {
+                get_triple_single(hand, last, next_moves);
+                get_triple_pair(hand, last, next_moves);
+                get_triple(hand, last, next_moves);
+                get_bomb(hand, last, next_moves);
+                get_bomb_single(hand, last, next_moves);
+                get_bomb_pair(hand, last, next_moves);
+                get_plane(hand, last, next_moves);
+                get_plane_single(hand, last, next_moves);
+                get_plane_pair(hand, last, next_moves);
+            }
+        }
     }
 
     Pattern *DouDiZhuHand::check_hand(const CardSet &hand)
@@ -250,11 +325,11 @@ namespace doudizhu_endgame
     void DouDiZhuHand::get_bomb(const CardSet &hand, Pattern *last, std::vector<Pattern *> &next_moves)
     {
         // powerx4 !!!!
-        if (last->type != Rocket)
+        if (last->type != Rocket && hand.size() >= 4)
         {
             for (int8_t i = 0; i < 13; ++i)
             {
-                if (hand.is_bomb(i) && (i << 2) > last->power)
+                if ((hand.is_bomb(i) && last->type == Bomb && i > last->power) || (hand.is_bomb(i) && last->type != Bomb))
                 {
 
                     CardSet res;
@@ -264,10 +339,6 @@ namespace doudizhu_endgame
                     next_moves.emplace_back(tmp);
                 }
             }
-        }
-        else
-        {
-            ////not move
         }
     }
 
@@ -668,7 +739,7 @@ namespace doudizhu_endgame
                     }
 
                     std::vector<std::vector<int8_t>> comb;
-                    combination(hand, used, comb_len, 1, comb);
+                    combination(hand, used, comb_len, 2, comb);
 
                     for (std::vector<int8_t> &j : comb)
                     {
