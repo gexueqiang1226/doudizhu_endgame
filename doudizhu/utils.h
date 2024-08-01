@@ -83,5 +83,12 @@ namespace doudizhu_endgame
         }
     }
 
+    static bool search_timeout(std::chrono::time_point<std::chrono::steady_clock> start, double limit)
+    {
+        std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapse = end - start;
+        return elapse.count() > limit;
+    }
+
 } // doudizhu_endgame
 #endif // DOUDIZHU_ENDGAME_UTILS_H

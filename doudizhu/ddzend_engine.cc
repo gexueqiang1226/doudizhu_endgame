@@ -33,7 +33,7 @@ extern "C"
 
         doudizhu_endgame::Negamax engine;
         std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
-        bool check = engine.search(c1, c2, last_hand);
+        bool check = engine.search_multithreading(c1, c2, last_hand);
         std::string ret = engine.best_move.hand.str();
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapse = end - start;

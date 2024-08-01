@@ -10,16 +10,14 @@ TARGET=ddz_endgame.so
  
 INCLUDES = -I. -I/usr/include/lua5.3
  
-CCFILES = $(wildcard *.cc *.hpp)
-CCFILES2 = $(wildcard *.cc)
+CCFILES = $(wildcard *.cc)
 CFILES = $(wildcard *.c)
 OBJFILE = $(CFILES:.c=.o) $(CCFILES:.cc=.o)
-OBJFILE2 = $(CFILES:.c=.o) $(CCFILES2:.cc=.o)
 
 all:$(TARGET)
  
 $(TARGET): $(OBJFILE)
-	$(LINK) $^ -Wall -fPIC -O3 -shared -o $@
+	$(LINK) $^ -Wall -fPIC -lpthread -O3 -shared -o $@
  
 %.o:%.c
 	$(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
@@ -32,4 +30,4 @@ install:
 
 clean:
 	rm -rf $(TARGET)
-	rm -rf $(OBJFILE2)
+	rm -rf $(OBJFILE)

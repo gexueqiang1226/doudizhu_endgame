@@ -5,13 +5,11 @@
 #ifndef DOUDIZHU_ENDGAME_NEGAMAX_H
 #define DOUDIZHU_ENDGAME_NEGAMAX_H
 
-#include <vector>
+#include <atomic>
 #include <cstdint>
 #include <cstring>
-#include <atomic>
-
 #include "cardset.h"
-#include "hand.h"
+#include "datastructure.h"
 
 namespace doudizhu_endgame
 {
@@ -44,13 +42,63 @@ namespace doudizhu_endgame
         HashItem *table_;
     };
 
+    template <typename T>
+    class ThreadSafe_Queue
+    {
+    public:
+        ThreadSafe_Queue() = default;
+
+        bool empty() const
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            return queue_.empty();
+        }
+
+        void push(T val)
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            queue_.push(val);
+            condition_.notify_one();
+        }
+
+        bool try_pop(T &val)
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (queue_.empty())
+            {
+                return false;
+            }
+            val = std::move(queue_.front());
+            queue_.pop();
+            return true;
+        }
+
+        void wait_and_pop(T &val)
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            condition_.wait(lock, [this]
+                            { return !queue_.empty(); });
+            val = std::move(queue_.front());
+            queue_.pop();
+        }
+
+    private:
+        mutable std::mutex mutex_;
+        std::queue<T> queue_;
+        std::condition_variable condition_;
+    };
+
     class Negamax
     {
     public:
         Negamax() = default;
         ~Negamax() = default;
 
+        std::chrono::time_point<std::chrono::steady_clock> _start;
+
         Pattern best_move{};
+
+        bool search_multithreading(const CardSet &lord, const CardSet &farmer, const Pattern &last);
 
         bool search(const CardSet &lord, const CardSet &farmer, const Pattern &last);
         void reset_result();
@@ -58,6 +106,8 @@ namespace doudizhu_endgame
     private:
         TranspositionTable transposition_table_;
         std::atomic<bool> finish_{false};
+
+        void worker(CardSet lord, CardSet farmer, Pattern last_move, ThreadSafe_Queue<Pattern> &done_queue);
 
         int32_t negamax(const CardSet &lord, const CardSet &farmer, const Pattern &last_move, int32_t turn);
     };

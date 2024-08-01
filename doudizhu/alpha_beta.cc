@@ -113,9 +113,7 @@ namespace doudizhu_endgame
 
     int AlphaBeta::Search(int depth, int alpha, int beta, std::list<Pattern> &pv)
     {
-        std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapse = end - _start;
-        if (elapse.count() > MAX_TIME || !_cards[_side].size() || !_cards[1 - _side].size())
+        if (search_timeout(_start, MAX_TIME) || !_cards[_side].size() || !_cards[1 - _side].size())
         {
             auto v = Evaluate();
             int score = _side ? -v : v;

@@ -9,10 +9,9 @@
 
 namespace doudizhu_endgame
 {
-
     int32_t Negamax::negamax(const CardSet &lord, const CardSet &farmer, const Pattern &last_move, int32_t turn)
     {
-        if (finish_)
+        if (finish_ || search_timeout(_start, MAX_TIME))
         {
             return 0;
         }
@@ -67,8 +66,42 @@ namespace doudizhu_endgame
         return score;
     }
 
+    void Negamax::worker(CardSet lord, CardSet farmer, Pattern last_move, ThreadSafe_Queue<Pattern> &done_queue)
+    {
+        int32_t val = -negamax(lord, farmer, last_move, FARMER_PLAY);
+        if (val > 0)
+        {
+            finish_.store(true);
+            done_queue.push(last_move);
+        }
+
+        if (search_timeout(_start, MAX_TIME))
+        {
+            finish_.store(true);
+        }
+    }
+
+    bool Negamax::search_multithreading(const CardSet &lord, const CardSet &farmer, const Pattern &last)
+    {
+        _start = std::chrono::steady_clock::now();
+        std::vector<Pattern> selections;
+        DouDiZhuHand::next_hand(lord, last, selections);
+        std::vector<std::thread> threads;
+        ThreadSafe_Queue<Pattern> done_queue;
+        for (Pattern &move : selections)
+        {
+            CardSet after_play;
+            DouDiZhuHand::play(lord, move.hand, after_play);
+            threads.emplace_back(std::thread(&Negamax::worker, this, after_play, farmer, move, std::ref(done_queue)));
+        }
+        std::for_each(threads.begin(), threads.end(), std::mem_fn(&std::thread::join));
+
+        return done_queue.try_pop(best_move);
+    }
+
     bool Negamax::search(const CardSet &lord, const CardSet &farmer, const Pattern &last)
     {
+        _start = std::chrono::steady_clock::now();
         std::vector<Pattern> selections;
         DouDiZhuHand::next_hand(lord, last, selections);
         for (Pattern &move : selections)
@@ -80,6 +113,10 @@ namespace doudizhu_endgame
             {
                 best_move = move;
                 return true;
+            }
+            if (search_timeout(_start, MAX_TIME))
+            {
+                return false;
             }
         }
         return false;
