@@ -148,12 +148,14 @@ namespace doudizhu_endgame
 
     void DouDiZhuHand::get_pair(const CardSet &hand, Pattern *last, std::vector<Pattern *> &next_moves)
     {
+        // printf("last: card %s, type: %d, power: %d \n", last->hand.str().c_str(), last->type, last->power);
         if (last->type == Pass || last->type == Pair)
         {
             for (int8_t i = 0; i < 15; ++i)
             {
                 if (hand.is_pair(i) && i > last->power)
                 {
+                    // printf("last: card %s, type: %d, power: %d, i: %d\n", last->hand.str().c_str(), last->type, last->power, i);
                     CardSet res;
                     res.set_pair(i);
                     Pattern *tmp = pattern_pool_.get(i, Pair, res);
@@ -490,7 +492,8 @@ namespace doudizhu_endgame
             create_straight(hand, 3, 2, straights);
             for (std::vector<int8_t> &i : straights)
             {
-                if (i.size() / 2 == last->hand.size() && i[0] > last->power)
+                // printf("straight_pair last: c %s; p %d, size: %d ; len: %d, c: %d\n", last->hand.str().c_str(), last->power, last->hand.size(), i.size(), i[0]);
+                if (i.size() * 2 == last->hand.size() && i[0] > last->power)
                 {
                     CardSet res;
                     res.set_straight_p(i[0], i.back());
@@ -529,7 +532,7 @@ namespace doudizhu_endgame
 
             for (std::vector<int8_t> &i : straights)
             {
-                if (i.size() == last->hand.size() / 3 && i[0] > last->power)
+                if (i.size() * 3 == last->hand.size() && i[0] > last->power)
                 {
                     CardSet res;
                     res.set_plane(i[0], i.back());

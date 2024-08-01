@@ -10,11 +10,12 @@ TARGET=ddz_endgame.so
  
 INCLUDES = -I. -I/usr/include/lua5.3
  
-C++FILES = $(wildcard *.cc)
+CCFILES = $(wildcard *.cc *.hpp)
+CCFILES2 = $(wildcard *.cc)
 CFILES = $(wildcard *.c)
- 
-OBJFILE = $(CFILES:.c=.o) $(C++FILES:.cpp=.o)
- 
+OBJFILE = $(CFILES:.c=.o) $(CCFILES:.cc=.o)
+OBJFILE2 = $(CFILES:.c=.o) $(CCFILES2:.cc=.o)
+
 all:$(TARGET)
  
 $(TARGET): $(OBJFILE)
@@ -23,7 +24,7 @@ $(TARGET): $(OBJFILE)
 %.o:%.c
 	$(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
  
-%.o:%.cpp
+%.o:%.cc
 	$(C++) -o $@ $(C++FLAGS) $< $(INCLUDES)
  
 install:
@@ -31,4 +32,4 @@ install:
 
 clean:
 	rm -rf $(TARGET)
-	rm -rf $(OBJFILE)
+	rm -rf $(OBJFILE2)

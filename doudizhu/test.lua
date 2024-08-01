@@ -142,12 +142,14 @@ xpcall(function()
     local ddz_endgame = require("ddz_endgame")
     print("输入地主的牌:")
     local lord = io.read();
+    if lord == "" then lord = "2KQ554433" end
     print("输入农民的牌:")
     local farmer = io.read();
+    if farmer == "" then farmer = "2KQ8877664" end
     print("输入上手出的牌:")
     local last = io.read();
     print("该谁出牌了(0-农民 1-地主):")
-    local turn = tonumber(io.read())
+    local turn = tonumber(io.read()) or 0
     local win, ret
     local games = 1
     repeat
@@ -207,7 +209,7 @@ xpcall(function()
                 break
             end
         end
-        turn = turn == 0 and 1 or 0
+        turn = 1 - turn
         games = games + 1
     until false
     print("谁赢了:", (win == 0 and "农民" or "地主"))

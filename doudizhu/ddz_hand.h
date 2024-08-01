@@ -33,10 +33,36 @@ namespace doudizhu_endgame
 
     struct Pattern
     {
-        int8_t power{};
-        Type type{};
+        int8_t power = -1;
+        Type type = Pass;
         CardSet hand;
     };
+
+    inline bool operator<(const Pattern &a, const Pattern &b)
+    {
+        if (a.type == Pass && b.type != Pass)
+        {
+            return true;
+        }
+        if (a.type == b.type && a.hand.size() == b.hand.size())
+        {
+            return a.power < b.power;
+        }
+        if (b.type == Rocket)
+        {
+            return true;
+        }
+        if (a.type != Rocket && b.type == Bomb)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    inline bool operator==(const Pattern &a, const Pattern &b)
+    {
+        return a.type == b.type && a.power == b.power && a.hand.size() == b.hand.size();
+    }
 
     class PatternPool
     {
@@ -61,8 +87,8 @@ namespace doudizhu_endgame
         void play(const CardSet &hand, Pattern *toplay, CardSet &res);
 
         void next_hand(const CardSet &hand, Pattern *last, std::vector<Pattern *> &next_moves);
-        
-        Pattern* check_hand(const CardSet &hand);
+
+        Pattern *check_hand(const CardSet &hand);
 
     private:
         PatternPool pattern_pool_;

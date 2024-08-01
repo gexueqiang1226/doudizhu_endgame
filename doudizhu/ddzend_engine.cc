@@ -1,5 +1,6 @@
 #include "ddzend_engine.h"
 #include "negamax.h"
+#include "alpha_beta.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -30,26 +31,39 @@ extern "C"
                 return nullptr;
             }
         }
-        doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
-        doudizhu_endgame::TreeNode *root = nullptr;
-        if (last_hand)
-        {
-            root = engine->search(c1, c2, last_hand);
-        }
-        else
-        {
-            root = engine->search(c1, c2);
-        }
-        if (!root->child.empty())
-        {
-            ret = root->child[0]->last_move->hand.str();
-        }
+        // doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
+        // doudizhu_endgame::TreeNode *root = nullptr;
+        // if (last_hand)
+        // {
+        //     root = engine->search(c1, c2, last_hand);
+        // }
+        // else
+        // {
+        //     root = engine->search(c1, c2);
+        // }
+        // if (!root->child.empty())
+        // {
+        //     ret = root->child[0]->last_move->hand.str();
+        // }
 
-        delete engine;
+        // delete engine;
 
-        return ret.data();
+        // if (!ret.empty())
+        // {
+        // printf("ddzend_search win: %s %s\n", ret.data(), ret.c_str());
+        // return ret.data();
+        // }
+
+        // 必输局, 需要用tip算法找个最优解
+        doudizhu_endgame::AlphaBeta *ab = new doudizhu_endgame::AlphaBeta();
+        std::string lastStr = last_hand ? last_hand->hand.str() : "";
+        // printf("ddzend_search last %s \n", lastStr.c_str());
+        ab->LoadCards(c1.str(), c2.str(), lastStr);
+        std::string ret2 = ab->GetBestMove();
+        // printf("ddzend_search win2: %s %s\n", ret2.data(), ret.c_str());
+        delete ab;
+        return ret2.data();
     }
-
 #ifdef __cplusplus
 };
 #endif
