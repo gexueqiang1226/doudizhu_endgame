@@ -17,52 +17,38 @@ extern "C"
         c1.from_c_string(const_cast<char *>(turn == 0 ? farmer : lord));
         c2.from_c_string(const_cast<char *>(turn == 0 ? lord : farmer));
 
-        std::string ret = "";
-        doudizhu_endgame::Pattern *last_hand = nullptr;
+        doudizhu_endgame::Pattern last_hand;
         doudizhu_endgame::DouDiZhuHand hand;
         doudizhu_endgame::CardSet ltcard;
         if (last != nullptr && last[0] != '\0')
         {
             ltcard.from_c_string(const_cast<char *>(last));
             last_hand = hand.check_hand(ltcard);
-            if (!last_hand)
+            if (last_hand.type == doudizhu_endgame::Pass)
             {
                 // 给的上手牌不合法
                 return nullptr;
             }
         }
-        // doudizhu_endgame::Negamax *engine = new doudizhu_endgame::Negamax();
-        // doudizhu_endgame::TreeNode *root = nullptr;
-        // if (last_hand)
-        // {
-        //     root = engine->search(c1, c2, last_hand);
-        // }
-        // else
-        // {
-        //     root = engine->search(c1, c2);
-        // }
-        // if (!root->child.empty())
-        // {
-        //     ret = root->child[0]->last_move->hand.str();
-        // }
 
-        // delete engine;
+        doudizhu_endgame::Negamax engine;
+        std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
+        bool check = engine.search(c1, c2, last_hand);
+        std::string ret = engine.best_move.hand.str();
+        std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapse = end - start;
+        printf("Negamax search: %f, check: %d, bet_move: %s\n", elapse.count(), check ? 1 : 0, check ? ret.c_str() : "not way");
+        if (!check)
+        {
+            // 必输局, 需要用tip算法找个最优解
+            doudizhu_endgame::AlphaBeta ab;
+            ab.LoadCards(c1.str(), c2.str(), last_hand.hand.str());
+            ret = ab.GetBestMove();
+        }
 
-        // if (!ret.empty())
-        // {
-        // printf("ddzend_search win: %s %s\n", ret.data(), ret.c_str());
-        // return ret.data();
-        // }
-
-        // 必输局, 需要用tip算法找个最优解
-        doudizhu_endgame::AlphaBeta *ab = new doudizhu_endgame::AlphaBeta();
-        std::string lastStr = last_hand ? last_hand->hand.str() : "";
-        // printf("ddzend_search last %s \n", lastStr.c_str());
-        ab->LoadCards(c1.str(), c2.str(), lastStr);
-        std::string ret2 = ab->GetBestMove();
-        // printf("ddzend_search win2: %s %s\n", ret2.data(), ret.c_str());
-        delete ab;
-        return ret2.data();
+        char *str = new char[ret.length()];
+        strcpy(str, ret.c_str());
+        return str;
     }
 #ifdef __cplusplus
 };

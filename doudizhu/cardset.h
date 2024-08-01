@@ -7,9 +7,12 @@
 
 #include <vector>
 #include <bitset>
+#include "utils.h"
 
 namespace doudizhu_endgame
 {
+
+#define BITSET_SIZE 64
 
     class CardSet
     {
@@ -23,7 +26,11 @@ namespace doudizhu_endgame
             return this->card_mask_ == other.card_mask_;
         }
 
-        //
+        std::bitset<BITSET_SIZE> raw() const
+        {
+            return card_mask_;
+        }
+
         size_t size() const
         {
             return card_mask_.count();
@@ -41,7 +48,7 @@ namespace doudizhu_endgame
 
         bool test(size_t pos) const
         {
-            return card_mask_[pos];
+            return card_mask_.test(pos);
         }
 
         uint64_t to_ullong() const
@@ -51,32 +58,32 @@ namespace doudizhu_endgame
 
         size_t find_first() const
         {
-            return card_mask_._Find_first();
+            return my_find_first(card_mask_.to_ullong(), BITSET_SIZE);
         }
 
         size_t find_next(size_t prev) const
         {
-            return card_mask_._Find_next(prev);
+            return my_find_next(prev, card_mask_.to_ullong(), BITSET_SIZE);
         }
 
         bool is_single(int8_t card) const
         {
-            return card_mask_[card << 2];
+            return card_mask_.test((size_t)card << 2);
         }
 
         bool is_pair(int8_t card) const
         {
-            return card_mask_[(card << 2) + 1];
+            return card_mask_.test((size_t)(card << 2) + 1);
         }
 
         bool is_trio(int8_t card) const
         {
-            return card_mask_[(card << 2) + 2];
+            return card_mask_.test((size_t)(card << 2) + 2);
         }
 
         bool is_bomb(int8_t card) const
         {
-            return card_mask_[(card << 2) + 3];
+            return card_mask_.test((size_t)(card << 2) + 3);
         }
 
         void set(size_t pos)
@@ -149,14 +156,12 @@ namespace doudizhu_endgame
 
         std::string bitset_str();
 
-        void from_string(std::string string);
+        bool from_string(std::string string);
 
         void from_c_string(char *string);
 
     private:
-        std::bitset<64> card_mask_;
+        std::bitset<BITSET_SIZE> card_mask_{};
     };
-
 } // namespace doudizhu_endgame
-
 #endif // DOUDIZHU_ENDGAME_CARDSET_H

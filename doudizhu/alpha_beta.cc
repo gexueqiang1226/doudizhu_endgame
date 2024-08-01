@@ -21,10 +21,9 @@ namespace doudizhu_endgame
 
     AlphaBeta::~AlphaBeta()
     {
-        // destroy_tree(tree_);
     }
 
-    void AlphaBeta::printCard(std::string pre, const std::multiset<byte> &pattern)
+    void AlphaBeta::printCards(std::string pre, const std::multiset<byte> &pattern)
     {
         if (!pattern.size())
             printf("%s pass \n", pre.c_str());
@@ -39,26 +38,20 @@ namespace doudizhu_endgame
 
     bool AlphaBeta::LoadCards(const std::string &str1, const std::string &str2, const std::string &last)
     {
-        // printf("LoadCards 111 \n");
-        // printf("LoadCards ggg %s \n", last.c_str());
-        // printf("LoadCards ggg1 %s \n", str1.c_str());
-        // printf("LoadCards ggg2 %s \n", str2.c_str());
-        if (!last.empty())
+        // printf("LoadCards start \n");
+        // printf("LoadCards str1: %s, str2: %s, last: %s\n", str1.c_str(), str2.c_str(), last.c_str());
+        if (!last.empty() && last != "P")
         {
-            // printf("LoadCards bbb \n");
-            // printf("aaa: %s \n", last.c_str());
             CardSet card;
             card.from_string(last.c_str());
-            // printf("bbb \n");
             DouDiZhuHand hand;
             // printf("ccc \n");
-            Pattern *ret = hand.check_hand(card);
-            // printf("ddd \n");
-            if (!ret)
+            Pattern ret = hand.check_hand(card);
+            if (ret.type == Pass)
             {
                 return false;
             }
-            _last = *ret;
+            _last = ret;
         }
         _cards[0].clear();
         _cards[1].clear();
@@ -66,20 +59,21 @@ namespace doudizhu_endgame
         {
             _cards[0].insert(_name2id[x]);
         }
-        // printCard("LoadCards", _cards[0]);
+        // printCards("LoadCards", _cards[0]);
         for (auto x : str2)
         {
             _cards[1].insert(_name2id[x]);
         }
-        // printCard("LoadCards", _cards[1]);
+        // printCards("LoadCards", _cards[1]);
         _round = 0;
         _side = 0;
+        // printf("LoadCards end \n");
         return true;
     }
 
     void AlphaBeta::Move(std::string hand)
     {
-        // printCard("Move1:" + hand, _cards[_side]);
+        // printCards("Move start:" + hand, _cards[_side]);
         if (!hand.empty() && hand != "P")
         {
             for (char c : hand)
@@ -87,7 +81,7 @@ namespace doudizhu_endgame
                 _cards[_side].erase(_cards[_side].find(_name2id[c]));
             }
         }
-        // printCard("Move2:" + hand, _cards[_side]);
+        // printCards("Move end:" + hand, _cards[_side]);
         _side = 1 - _side;
         ++_round;
     }
@@ -95,7 +89,7 @@ namespace doudizhu_endgame
     {
         _side = 1 - _side;
         --_round;
-        // printCard("UnMove1:" + hand, _cards[_side]);
+        // printCards("UnMove start:" + hand, _cards[_side]);
         if (!hand.empty() && hand != "P")
         {
             for (char c : hand)
@@ -103,13 +97,13 @@ namespace doudizhu_endgame
                 _cards[_side].insert(_name2id[c]);
             }
         }
-        // printCard("UnMove1:" + hand, _cards[_side]);
+        // printCards("UnMove end:" + hand, _cards[_side]);
     }
 
     std::string AlphaBeta::GetCardSting()
     {
         std::string str = "";
-        // printCard("GetCardSting", _cards[_side]);
+        // printCards("GetCardSting", _cards[_side]);
         for (auto x : _cards[_side])
         {
             str += _id2name[x];
@@ -117,53 +111,43 @@ namespace doudizhu_endgame
         return str;
     }
 
-    int AlphaBeta::Search(int depth, int alpha, int beta, std::list<Pattern *> &pv)
+    int AlphaBeta::Search(int depth, int alpha, int beta, std::list<Pattern> &pv)
     {
-#if USE_HASHMAP
-        if (_hash.find(_cards[_side], _cards[1 - _side], _last, depth))
-        {
-            auto val = _hash.get();
-            pv = val.path;
-            return val.score;
-            // else continue alpha-beta search
-        }
-#endif
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapse = end - _start;
         if (elapse.count() > MAX_TIME || !_cards[_side].size() || !_cards[1 - _side].size())
         {
             auto v = Evaluate();
             int score = _side ? -v : v;
-            // printf("Search ret %d, %d, %d, %d, %d, %d\n", depth, _side, _cards[_side].size(), _cards[1 - _side].size(), selections.size(), score);
+            // printf("Search ret %d, %d, %d, %d, %d\n", depth, _side, _cards[_side].size(), _cards[1 - _side].size(), score);
             return score;
         }
 
         CardSet cs;
         cs.from_string(this->GetCardSting());
-        std::vector<Pattern *> selections;
-        // printf("Search %d %d cs: %s \n", depth, _side, cs.str_h().c_str());
-        // printf("Search %d %d _last: %s \n", depth, _side, _last.hand.str_h().c_str());
-        doudizhu_.next_hand(cs, &_last, selections);
+        std::vector<Pattern> selections;
+        doudizhu_.next_hand(cs, _last, selections);
 
         std::sort(
             selections.begin(),
             selections.end(),
-            [](const Pattern *a, const Pattern *b)
+            [](const Pattern &a, const Pattern &b)
             {
-                return a->hand.size() > b->hand.size();
+                return a.hand.size() > b.hand.size();
             });
-        // std::string str = "";
-        // for (Pattern *s : selections)
-        // {
-        //     if (s->hand.str() != "P")
-        //     {
-        //         str += " " + s->hand.str();
-        //     }
-        // }
-        // printf("%d, %d, last: %s, card: %s, cs: %s\n", depth, _side, _last.hand.str().c_str(), cs.str().c_str(), str.c_str());
 
-        // printCard("Search", _cards[_side]);
-        //  printf("Search %d, %d, %d, %d, %d\n", depth, _side, _cards[_side].size(), _cards[1 - _side].size(), selections.size());
+        /*
+                std::string str = "";
+                for (Pattern s : selections)
+                {
+                    if (s.hand.str() != "P")
+                    {
+                        str += " " + s.hand.str();
+                    }
+                }
+                printf("%d, %d, last: %s, card: %s, cs: %s\n", depth, _side, _last.hand.str().c_str(), cs.str().c_str(), str.c_str());
+        */
+
         if (depth <= 0 && selections.size() > 1)
         {
             auto v = Evaluate();
@@ -174,13 +158,13 @@ namespace doudizhu_endgame
 
         int value;
         Pattern last = _last;
-        std::list<Pattern *> line;
-        for (Pattern *s : selections)
+        std::list<Pattern> line;
+        for (Pattern s : selections)
         {
-            this->Move(s->hand.str());
-            _last = *s;
+            this->Move(s.hand.str());
+            _last = s;
             value = -Search(depth - 1, -beta, -alpha, line);
-            this->UnMove(s->hand.str());
+            this->UnMove(s.hand.str());
             if (value > beta)
             {
                 return beta;
@@ -194,13 +178,6 @@ namespace doudizhu_endgame
             if (alpha > WIN_SCORE)
                 break;
         }
-
-#if USE_HASHMAP
-        if (depth == _max_depth && (alpha > WIN_SCORE || alpha < -WIN_SCORE))
-        {
-            _hash.put(_cards[_side], _cards[1 - _side], last, pv, depth, alpha);
-        }
-#endif
         _last = last;
         return alpha;
     }
@@ -253,15 +230,12 @@ namespace doudizhu_endgame
             depth = 128;
         _max_depth = depth;
         _start = std::chrono::steady_clock::now();
-        // printf("GetBestMove 111 \n");
         int value = Search(depth, -MAX_SCORE, MAX_SCORE, _pv);
-
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapse = end - _start;
 
-        // printf("GetBestMove 222 \n");
-        Pattern *ret = _pv.front();
-        printf("GetBestMove time: %f, score: %d, cards: %s\n", elapse.count(), value, ret->hand.str().c_str());
-        return ret->hand.str();
+        Pattern ret = _pv.front();
+        printf("GetBestMove time: %f, score: %d, cards: %s\n", elapse.count(), value, ret.hand.str().c_str());
+        return ret.hand.str();
     }
 } // namespace doudizhu_endgame

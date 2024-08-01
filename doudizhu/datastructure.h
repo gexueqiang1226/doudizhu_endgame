@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <chrono>
-#include "ddz_hand.h"
+#include "hand.h"
 typedef char byte;
 
 #define USE_HASHMAP 0

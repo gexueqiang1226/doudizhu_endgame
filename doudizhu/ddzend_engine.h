@@ -1,6 +1,5 @@
-#ifndef _DDZEND_ENGINE_H__
-#define _DDZEND_ENGINE_H__
-
+#ifndef _DDZEND_ENGINE_H_
+#define _DDZEND_ENGINE_H_
 #ifdef __cplusplus
 extern "C"
 {

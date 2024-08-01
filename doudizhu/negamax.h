@@ -5,82 +5,62 @@
 #ifndef DOUDIZHU_ENDGAME_NEGAMAX_H
 #define DOUDIZHU_ENDGAME_NEGAMAX_H
 
-#include <unordered_map>
 #include <vector>
+#include <cstdint>
+#include <cstring>
+#include <atomic>
 
 #include "cardset.h"
-#include "ddz_hand.h"
+#include "hand.h"
 
 namespace doudizhu_endgame
 {
 
-#define TRANSPOSITION_TABLE_INIT_SIZE 3000000
+#define TRANSPOSITION_TABLE_SIZE (1024 * 1024 * 2)
+#define TRANSPOSITION_TABLE_SIZE_MASK ((TRANSPOSITION_TABLE_SIZE) - 1)
 
-    struct TreeNode
-    {
-        int8_t turn; // 0: lord 1:farmer
-        int8_t score;
-        CardSet lord;
-        CardSet farmer;
-        Pattern *last_move;
-        std::vector<TreeNode *> child;
-    };
+//'127' should be better then '1'
+#define FARMER_PLAY 127
+#define LORD_PLAY 0
 
     class TranspositionTable
     {
     public:
-        TranspositionTable()
+        TranspositionTable();
+        ~TranspositionTable();
+
+        struct HashItem
         {
-            table_.reserve(TRANSPOSITION_TABLE_INIT_SIZE);
-        }
+            uint32_t key{};
+            int32_t score{};
+        };
 
-        ~TranspositionTable() = default;
-
-        size_t size();
-        void add(TreeNode *node);
-
-        // return score from table, if not in table return 0
-        int8_t get(TreeNode *node);
+        void reset();
+        void add(uint32_t key, int32_t score);
+        int32_t get(uint32_t key);
+        static uint32_t gen_key(const CardSet &lord, const CardSet &farmer, const CardSet &last_move, int32_t turn);
 
     private:
-        std::unordered_map<uint64_t, int8_t> table_;
-        uint64_t gen_key(TreeNode *node);
+        HashItem *table_;
     };
 
     class Negamax
     {
     public:
-        Negamax();
-        ~Negamax();
+        Negamax() = default;
+        ~Negamax() = default;
 
-        TreeNode *search(const CardSet &lord, const CardSet &farmer);
-        // for research
-        TreeNode *search(const CardSet &lord, const CardSet &farmer, Pattern *last);
+        Pattern best_move{};
 
-        size_t nodes_searched()
-        {
-            return nodes_searched_;
-        }
-
-        double hash_hit_rate()
-        {
-            return ((double)hash_hit_ / nodes_searched_) * 100;
-        }
+        bool search(const CardSet &lord, const CardSet &farmer, const Pattern &last);
+        void reset_result();
 
     private:
-        TreeNode *tree_;
-        TranspositionTable table_;
-        DouDiZhuHand doudizhu_;
+        TranspositionTable transposition_table_;
+        std::atomic<bool> finish_{false};
 
-        size_t nodes_searched_{};
-        size_t hash_hit_{};
-
-        int8_t negamax(TreeNode *node);
-        void gen_nodes(TreeNode *node);
-        void pruning_tree(TreeNode *node);
-        void destroy_tree(TreeNode *node);
+        int32_t negamax(const CardSet &lord, const CardSet &farmer, const Pattern &last_move, int32_t turn);
     };
-
 } // namespace doudizhu_endgame
 
 #endif // DOUDIZHU_ENDGAME_NEGAMAX_H
