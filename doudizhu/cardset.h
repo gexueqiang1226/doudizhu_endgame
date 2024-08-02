@@ -150,6 +150,7 @@ namespace doudizhu_endgame
         void remove(const CardSet &hand);
 
         bool has_count(int8_t card, int8_t count) const;
+        int8_t card_count(int8_t card) const;
 
         std::string str_h();
         std::string str();

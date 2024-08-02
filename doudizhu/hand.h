@@ -34,8 +34,9 @@ namespace doudizhu_endgame
         int8_t power = -1;
         Type type = Pass;
         CardSet hand{};
+        int8_t count = 0;
 
-        Pattern(int8_t power, Type type, CardSet hand) : power(power), type(type), hand(hand)
+        Pattern(int8_t power, Type type, CardSet hand, int8_t count = 0) : power(power), type(type), hand(hand), count(count)
         {
         }
 

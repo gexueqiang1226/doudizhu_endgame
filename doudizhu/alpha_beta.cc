@@ -127,15 +127,6 @@ namespace doudizhu_endgame
         cs.from_string(this->GetCardSting());
         std::vector<Pattern> selections;
         doudizhu_.next_hand(cs, _last, selections);
-
-        std::sort(
-            selections.begin(),
-            selections.end(),
-            [](const Pattern &a, const Pattern &b)
-            {
-                return a.hand.size() > b.hand.size();
-            });
-
         /*
                 std::string str = "";
                 for (Pattern s : selections)

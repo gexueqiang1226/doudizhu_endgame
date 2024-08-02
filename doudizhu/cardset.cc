@@ -139,6 +139,33 @@ namespace doudizhu_endgame
         }
     }
 
+    // 获取牌数, 为了控制AI拆牌(主要是拆炸弹, 做个特殊处理)
+    int8_t CardSet::card_count(int8_t card) const
+    {
+        if (card >= 13)
+        {
+            if (card_mask_[card << 2])
+            {
+                if (card_mask_[52] && card_mask_[56])
+                {
+                    return 99;
+                }
+                return 1;
+            }
+        }
+        else
+        {
+            for (size_t i = 4; i > 0; i--)
+            {
+                if (card_mask_[(card << 2) + (i - 1)])
+                {
+                    return i;
+                }
+            }
+        }
+        return 0;
+    }
+
     std::string CardSet::str()
     {
         std::string string;

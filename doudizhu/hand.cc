@@ -134,6 +134,24 @@ namespace doudizhu_endgame
                 get_plane_pair(hand, last, next_moves);
             }
         }
+        if (next_moves.size() > 1)
+        {
+            std::sort(
+                next_moves.begin(),
+                next_moves.end(),
+                [](const Pattern &a, const Pattern &b)
+                {
+                    if (a.hand.size() != b.hand.size())
+                    {
+                        return a.hand.size() > b.hand.size();
+                    }
+                    if (a.count != b.count)
+                    {
+                        return a.count < b.count;
+                    }
+                    return a.power > b.power;
+                });
+        }
     }
 
     Pattern DouDiZhuHand::check_hand(const CardSet &hand)
@@ -175,7 +193,7 @@ namespace doudizhu_endgame
             {
                 CardSet res;
                 res.set_single(i);
-                next_moves.emplace_back(i, Single, res);
+                next_moves.emplace_back(i, Single, res, hand.card_count(i));
             }
         }
     }
@@ -188,7 +206,7 @@ namespace doudizhu_endgame
             {
                 CardSet res;
                 res.set_pair(i);
-                next_moves.emplace_back(i, Pair, res);
+                next_moves.emplace_back(i, Pair, res, hand.card_count(i));
             }
         }
     }
@@ -201,7 +219,7 @@ namespace doudizhu_endgame
             {
                 CardSet res;
                 res.set_trio(i);
-                next_moves.emplace_back(i, Triple, res);
+                next_moves.emplace_back(i, Triple, res, hand.card_count(i));
             }
         }
     }
