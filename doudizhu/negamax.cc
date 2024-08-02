@@ -4,8 +4,8 @@
 #include <thread>
 #include <functional>
 #include <algorithm>
-#include "negamax.h"
 #include "utils.h"
+#include "negamax.h"
 
 namespace doudizhu_endgame
 {

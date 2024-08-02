@@ -2,7 +2,9 @@
 // Created by deng on 18-11-28.
 //
 
+#include "utils.h"
 #include "alpha_beta.h"
+
 namespace doudizhu_endgame
 {
     const char CARD_TYPES[15] = {'3', '4', '5', '6', '7', '8', '9', '0', 'J', 'Q', 'K', 'A', '2', 'Y', 'Z'};

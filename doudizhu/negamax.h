@@ -8,9 +8,7 @@
 #include <atomic>
 #include <cstdint>
 #include <cstring>
-#include "cardset.h"
 #include "datastructure.h"
-
 namespace doudizhu_endgame
 {
 

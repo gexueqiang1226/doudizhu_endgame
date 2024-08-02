@@ -12,7 +12,9 @@ INCLUDES = -I. -I/usr/include/lua5.3
  
 CCFILES = $(wildcard *.cc)
 CFILES = $(wildcard *.c)
-OBJFILE = $(CFILES:.c=.o) $(CCFILES:.cc=.o)
+#OBJFILE = $(CFILES:.c=.o) $(CCFILES:.cc=.o)
+OBJFILE = $(CFILES:.c=.o) $(CCFILES)
+OBJFILE2 = $(CFILES:.c=.o)
 
 all:$(TARGET)
  
@@ -22,12 +24,12 @@ $(TARGET): $(OBJFILE)
 %.o:%.c
 	$(CC) -o $@ $(CCFLAGS) $< $(INCLUDES)
  
-%.o:%.cc
-	$(C++) -o $@ $(C++FLAGS) $< $(INCLUDES)
+#%.o:%.cc
+#	$(C++) -o $@ $(C++FLAGS) $< $(INCLUDES)
  
 install:
 	tsxs -i -o $(TARGET)
 
 clean:
 	rm -rf $(TARGET)
-	rm -rf $(OBJFILE)
+	rm -rf $(OBJFILE2)

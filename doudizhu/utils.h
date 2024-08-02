@@ -6,6 +6,7 @@
 #define DOUDIZHU_ENDGAME_UTILS_H
 
 #include <map>
+#include <chrono>
 #include <mutex>
 #include <queue>
 #include <condition_variable>
@@ -83,7 +84,7 @@ namespace doudizhu_endgame
         }
     }
 
-    static bool search_timeout(std::chrono::time_point<std::chrono::steady_clock> start, double limit)
+    inline bool search_timeout(std::chrono::time_point<std::chrono::steady_clock> start, double limit)
     {
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapse = end - start;
