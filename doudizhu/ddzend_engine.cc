@@ -45,10 +45,7 @@ extern "C"
             ab.LoadCards(c1.str(), c2.str(), last_hand.hand.str());
             ret = ab.GetBestMove();
         }
-
-        char *str = new char[ret.length()];
-        strcpy(str, ret.c_str());
-        return str;
+        return ret.c_str();
     }
 #ifdef __cplusplus
 };
