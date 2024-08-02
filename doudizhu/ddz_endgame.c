@@ -58,10 +58,12 @@ static int lua_ddz_endgame_call(lua_State *L)
     const char *last = get_string_value_by_name(L, -1, "last");
     int turn = get_integer_value_by_name(L, -1, "turn");
     int states = get_integer_value_by_name(L, -1, "states");
-    const char *result = ddzend_search(lord, farmer, last, turn, states);
+    const char *result = NULL;
+    int check = ddzend_search(lord, farmer, last, turn, states, &result);
     printf("args lord: %s, farmer: %s, last: %s, turn: %d, states: %d, result: %s \n", lord, farmer, last, turn, states, result);
     result ? lua_pushstring(L, result) : lua_pushnil(L);
-    return 1;
+    lua_pushinteger(L, check);
+    return 2;
 }
 
 static const struct luaL_Reg reg[] = {

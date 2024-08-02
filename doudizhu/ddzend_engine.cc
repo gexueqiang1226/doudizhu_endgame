@@ -6,12 +6,12 @@
 extern "C"
 {
 #endif
-    const char *ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states)
+    int ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states, const char **result)
     {
 
         if ((lord == nullptr || lord[0] == '\0') || (farmer == nullptr || farmer[0] == '\0'))
         {
-            return nullptr;
+            return -1;
         }
         doudizhu_endgame::CardSet c1, c2;
         c1.from_c_string(const_cast<char *>(turn == 0 ? farmer : lord));
@@ -27,7 +27,7 @@ extern "C"
             if (last_hand.type == doudizhu_endgame::Pass)
             {
                 // 给的上手牌不合法
-                return nullptr;
+                return -1;
             }
         }
 
@@ -45,7 +45,8 @@ extern "C"
             ab.LoadCards(c1.str(), c2.str(), last_hand.hand.str());
             ret = ab.GetBestMove();
         }
-        return ret.c_str();
+        *result = ret.c_str();
+        return check ? 1 : 0;
     }
 #ifdef __cplusplus
 };

@@ -10,7 +10,7 @@ extern "C"
      * last string 上手牌
      * state int 规则
      */
-    extern const char *ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states);
+    extern int ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states, const char **ret);
 
 #ifdef __cplusplus
 };
