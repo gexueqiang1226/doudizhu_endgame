@@ -1,6 +1,3 @@
-local _stages = require("ddzend_stages")
-local _ddz_endgame = require("ddz_endgame")
-
 function __G__TRACKBACK__(msg)
     if msg then print(tostring(msg)) end
     print(debug.traceback())
@@ -168,48 +165,82 @@ local function getCards(str)
 
     return table.concat(list, '')
 end
-local function get() end
 
 xpcall(function()
     -- 程序入口
-    local rets = {}
-    for i, v in ipairs(_stages) do
-        local last = ""
-        local lord = getCards(v.lord)
-        local farmer = getCards(v.farmer)
-        local turn = v.turn
-        if v.turn == 0 then
-            last = _ddz_endgame.call({
+    print("!!! BAT START !!!")
+    local ddz_endgame = require("ddz_endgame")
+    print("输入机器人的牌:")
+    local lord = getCards(io.read())
+    print("输入玩家的牌:")
+    local farmer = getCards(io.read())
+    print("输入上手出的牌:")
+    local last = getCards(io.read())
+    print("该谁出牌了(0-玩家 1-机器人):")
+    local turn = tonumber(io.read()) or 0
+    local win, ret, check
+    local games = 1
+    repeat
+        if turn == 1 then
+            print("请输入机器人出牌:")
+            ret = io.read()
+            last = ret ~= "P" and ret or ""
+            for char in ret:gmatch(".") do
+                -- 对每个字符执行操作
+                lord = string.gsub(lord, "(.*)(" .. char .. ")(.*)", "%1%3")
+            end
+            print("=====" .. games .. "======")
+            print("机器人出:", ret)
+            print("玩家剩余牌:", farmer)
+            print("机器人剩余牌:", lord)
+            print("===========")
+            if lord == "" then
+                win = 1
+                break
+            end
+        else
+            ret, check = ddz_endgame.call({
                 lord = lord,
                 farmer = farmer,
-                last = "",
+                last = last,
                 turn = turn,
-                states = v.states
+                states = 0
             })
-
-            turn = 1 - turn
-            if last ~= "" then
-                for char in last:gmatch(".") do
-                    -- 对每个字符执行操作
-                    farmer = string.gsub(farmer, "(.*)(" .. char .. ")(.*)",
-                                         "%1%3")
+            print("ret:", ret, ";check:", check)
+            if games == 1 and not ret then
+                -- 输入参数有问题
+                print("error: 输入的参数有问题")
+                return
+            end
+            if ret == "" then
+                print("必输牌, 是否还玩儿下去(y/n):")
+                local input = io.read()
+                if input == "n" then
+                    win = 1
+                    break
                 end
+                print("请输入玩家出牌:")
+                ret = io.read()
+            end
+
+            last = ret ~= "P" and ret or ""
+            for char in ret:gmatch(".") do
+                -- 对每个字符执行操作
+                farmer = string.gsub(farmer, "(.*)(" .. char .. ")(.*)", "%1%3")
+            end
+            print("=====" .. games .. "======")
+            print("玩家出:", ret)
+            print("玩家剩余牌:", farmer)
+            print("机器人剩余牌:", lord)
+            print("===========")
+            if farmer == "" then
+                win = 0
+                break
             end
         end
-        
-        local bestmove, check = _ddz_endgame.call({
-            lord = lord,
-            farmer = farmer,
-            last = last,
-            turn = turn,
-            states = v.states
-        })
-        table.insert(rets, table.concat({
-            v.id, "lord:" .. getCards(v.lord), "farmer:" .. getCards(v.farmer),
-            v.turn == 0 and "last:" .. last or "fisrt",
-            check == 1 and bestmove or "无解"
-        }, ","))
-    end
-
-    print(table.concat(rets, "\n"))
+        turn = 1 - turn
+        games = games + 1
+    until false
+    print("谁赢了:", (win == 0 and "玩家" or "机器人"))
+    print("!!! BAT END !!!")
 end, __G__TRACKBACK__)

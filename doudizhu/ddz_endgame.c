@@ -46,7 +46,7 @@ const char *get_string_value_by_name(lua_State *L, int index, const char *name)
  * lord string 地主的牌 A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass)
  * farmer string 玩家的牌
  * last string 上把出的牌
- * turn int 谁出牌 0农民 1底注
+ * turn int 谁出牌 0农民 1地主
  * states int  一些规则(保留字段)
  * return string 要出的牌 空串表示无法赢
  */
