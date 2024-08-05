@@ -269,7 +269,7 @@ namespace doudizhu_endgame
         {
             for (int8_t i = 0; i < 13; ++i)
             {
-                if ((hand.is_bomb(i) && last.type == Bomb && i > last.power) || (hand.is_bomb(i) && last.type != Bomb))
+                if ((hand.is_bomb(i) && last.type == Bomb && (i << 2) > last.power) || (hand.is_bomb(i) && last.type != Bomb))
                 {
                     CardSet res;
                     res.set_bomb(i);

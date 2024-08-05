@@ -196,7 +196,7 @@ xpcall(function()
                 end
             end
         end
-        
+
         local bestmove, check = _ddz_endgame.call({
             lord = lord,
             farmer = farmer,
@@ -205,9 +205,8 @@ xpcall(function()
             states = v.states
         })
         table.insert(rets, table.concat({
-            v.id, "lord:" .. getCards(v.lord), "farmer:" .. getCards(v.farmer),
-            v.turn == 0 and "last:" .. last or "fisrt",
-            check == 1 and bestmove or "无解"
+            v.id, "p:" .. getCards(v.lord), "r:" .. getCards(v.farmer),
+            "last:" .. last, check == 1 and "move:" .. bestmove or "无解"
         }, ","))
     end
 

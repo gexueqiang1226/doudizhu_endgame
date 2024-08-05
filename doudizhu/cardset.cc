@@ -166,10 +166,9 @@ namespace doudizhu_endgame
         return 0;
     }
 
-    std::string CardSet::str()
+    std::string CardSet::str() const
     {
         std::string string;
-        string.clear();
         size_t pos = find_first();
         while (pos < 64)
         {
@@ -188,10 +187,9 @@ namespace doudizhu_endgame
         return string;
     }
 
-    std::string CardSet::str_h()
+    std::string CardSet::str_h() const
     {
         std::string string;
-        string.clear();
         size_t pos = find_first();
         while (pos < 64)
         {
@@ -205,7 +203,7 @@ namespace doudizhu_endgame
 
         if (string.length() == 0)
         {
-            string += val2card[15];
+            string += val2card_h[15];
         }
         string.pop_back();
         return string;
