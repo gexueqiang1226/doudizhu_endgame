@@ -2,6 +2,31 @@
 
 这是一个高效、占用内存小的用于求解斗地主残局的项目。使用C++实现，运用了负极大值算法(Negamax)并使用置换表来加速搜索。
 
+
+## 新增修改如下:
+
++ 1.由于之前版本只有在必赢时才有出牌方案, 加获取最优解alphabeta算法, 用于在无解状态下, 获取最优出牌方案.
+
++ 2.提供了Lua5.3接口, 使用方式, 见test.lua, 可以当斗地主残局解题器用, 也可当作斗地主残局AI用
+```Lua
+    --[[
+        * ddz_endgame.call 需要的参数:
+        * lord string 机器人的牌 A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass)
+        * farmer string 玩家的的牌
+        * last string 上把出的牌
+        * turn int 谁出牌 0-玩家 1-机器人
+        * states int  一些规则(保留字段 默认填0)
+        * return string(出牌结果 nil-表示输入不合法), int(胜负结果 0-必输 1-必胜)
+    ]]
+    local ret, check = ddz_endgame.call({
+        lord = lord,
+        farmer = farmer,
+        last = last,
+        turn = turn,
+        states = 0
+    })
+```
+
 ## 如何使用
 
 ```C++

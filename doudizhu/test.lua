@@ -140,10 +140,12 @@ xpcall(function()
     -- 程序入口
     print("!!! BAT START !!!")
     local ddz_endgame = require("ddz_endgame")
-    print("输入机器人的牌:")
+    print(
+        "输入机器人的牌,A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass):")
     local lord = io.read();
     if lord == "" then lord = "2KQ554433" end
-    print("输入玩家的牌:")
+    print(
+        "输入玩家的牌,A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass):")
     local farmer = io.read();
     if farmer == "" then farmer = "2KQ8877664" end
     print("输入上手出的牌:")
@@ -171,6 +173,15 @@ xpcall(function()
                 break
             end
         else
+            --[[
+                * ddz_endgame.call 需要的参数:
+                * lord string 机器人的牌 A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass)
+                * farmer string 玩家的的牌
+                * last string 上把出的牌
+                * turn int 谁出牌 0-玩家 1-机器人
+                * states int  一些规则(保留字段 默认填0)
+                * return string(出牌结果 nil-表示输入不合法), int(胜负结果 0-必输 1-必胜)
+            ]]
             ret, check = ddz_endgame.call({
                 lord = lord,
                 farmer = farmer,

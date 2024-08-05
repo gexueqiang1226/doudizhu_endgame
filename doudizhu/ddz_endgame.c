@@ -43,7 +43,7 @@ const char *get_string_value_by_name(lua_State *L, int index, const char *name)
 
 /**
  * 需要的参数:
- * lord string 地主的牌 A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass)
+ * lord string 机器人的牌 A234567890JQKYZP(0-10, Y-小王, Z-大王, P-Pass)
  * farmer string 玩家的牌
  * last string 上把出的牌
  * turn int 谁出牌 0农民 1地主
