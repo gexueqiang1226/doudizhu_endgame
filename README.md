@@ -45,13 +45,11 @@ int main()
 }
 ```
 
-或者在linux下使用cmake直接构建
+或者在linux下使用make直接构建(需要安装Lua5.3以上环境, 如liblua5.3-dev)
 
 ```
-git clone https://github.com/YunyanDeng/doudizhu_endgame.git
-mkdir doudizhu_endgame/build
-cd doudizhu_endgame/build
-cmake ../doudizhu/
+git clone https://github.com/gexueqiang1226/doudizhu_endgame.git
+cd doudizhu_endgame
 make
 ```
 
