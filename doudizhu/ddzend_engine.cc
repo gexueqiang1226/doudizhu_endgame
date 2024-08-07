@@ -6,7 +6,7 @@
 extern "C"
 {
 #endif
-    int ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states, const char **result)
+    int ddzend_search(const char *lord, const char *farmer, const char *last, int turn, int states, const char **result, int *slen)
     {
 
         if ((lord == nullptr || lord[0] == '\0') || (farmer == nullptr || farmer[0] == '\0'))
@@ -46,6 +46,7 @@ extern "C"
             ret = ab.GetBestMove();
         }
         *result = ret.c_str();
+        *slen = ret.length();
         return check ? 1 : 0;
     }
 #ifdef __cplusplus
