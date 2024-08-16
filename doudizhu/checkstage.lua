@@ -211,7 +211,8 @@ xpcall(function()
         end
         table.insert(rets, table.concat({
             v.id, "p:" .. getCards(v.lord), "r:" .. getCards(v.farmer),
-            "last:" .. last, check == 1 and "move:" .. bestmove or "无解"
+            "last:" .. last, check == 1 and "move:" .. bestmove or "无解",
+            (farmer == "" or string.len(bestmove) == lord) and 0 or 1
         }, ","))
     end
 
