@@ -65,6 +65,7 @@ static int lua_ddz_endgame_call(lua_State *L)
     if (result)
     {
         lua_pushlstring(L, result, slen);
+        free((void *)result);
     }
     else
     {

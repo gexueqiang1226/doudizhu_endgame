@@ -45,7 +45,9 @@ extern "C"
             ab.LoadCards(c1.str(), c2.str(), last_hand.hand.str());
             ret = ab.GetBestMove();
         }
-        *result = ret.c_str();
+        char *cstr = new char[ret.length() + 1];
+        std::strcpy(cstr, ret.c_str());
+        *result = cstr;
         *slen = ret.length();
         return check ? 1 : 0;
     }
